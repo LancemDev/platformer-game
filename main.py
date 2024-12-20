@@ -23,9 +23,66 @@ def draw(window, background, bg_image, player, objects, offset_x):
     player.draw(window, offset_x)
 
     pygame.display.update()
+    
+# Initialize the game
+def main(window):
+    clock = pygame.time.Clock()
+    FPS = 60
+
+    # Load background
+    background, bg_image = get_background("Blue.png")
+    block_size = 96
+
+    # Create player object
+    player = Player(100, 100, 50, 50)
+
+    # Create the fire object
+    fire = Fire(100, HEIGHT - block_size - 64, 16, 32)
+    fire.on()
+
+    # Create terrain
+    objects = create_random_terrain(block_size, WIDTH, HEIGHT)
+    objects.append(fire)
+
+    # Create target block safely
+    target_block = None
+    try:
+        target_block = create_random_target_block(block_size, WIDTH, HEIGHT, player.rect.topleft, objects)
+        objects.append(target_block)
+    except ValueError as e:
+        print(f"Error creating target block: {e}")
+
+    offset_x = 0
+    scroll_area_width = 200
+
+    # Main loop
+    run = True
+    while run:
+        clock.tick(FPS)  # Cap the frame rate
+
+        # --- Event Handling ---
+        run = handle_events(player)
+
+        # --- Update Logic ---
+        player.loop(FPS)
+        fire.loop()
+        handle_move(player, objects)
+
+        # Check for target block collision
+        if target_block and check_congratulation_collision(player, target_block):
+            display_congratulations(window)
+
+        # --- Camera Logic ---
+        offset_x = handle_scrolling(player)
+
+        # --- Draw Everything ---
+        draw_frame(window, background, bg_image, player, objects, offset_x)
+
+    # Clean up
+    pygame.quit()
 
 
-
+# Event handling
 def handle_events(player):
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -70,8 +127,6 @@ def reload_game():
     """Function to reload or restart the game"""
     # You can either reset the level or restart the entire game by reinitializing the main function
     main(window)
-
-
 
 if __name__ == "__main__":
     window = pygame.display.set_mode((WIDTH, HEIGHT))
