@@ -49,6 +49,29 @@ def handle_scrolling(player):
     return offset_x
 
 
+# Draw all game elements
+def draw_frame(window, background, bg_image, player, objects, offset_x):
+    """Draw all game elements"""
+    window.fill((0, 0, 0))  # Clear the screen
+    draw(window, background, bg_image, player, objects, offset_x)  # Player is drawn here
+    pygame.display.update()
+  
+def display_congratulations(window):
+    """Show the congratulatory message and reload the game after 3 seconds"""
+    font = pygame.font.SysFont('Serif', 50)
+    text = font.render("Congratulations! You've won!", True, (255, 255, 255))
+    window.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - text.get_height() // 2))
+    pygame.display.flip()
+
+    pygame.time.wait(3000)  # Wait for 3 seconds
+    reload_game()  # Reload the game or restart the level
+
+def reload_game():
+    """Function to reload or restart the game"""
+    # You can either reset the level or restart the entire game by reinitializing the main function
+    main(window)
+
+
 
 if __name__ == "__main__":
     window = pygame.display.set_mode((WIDTH, HEIGHT))
